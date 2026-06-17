@@ -109,7 +109,9 @@ include 'includes/header.php';
     <select name="status">
         <option value="">Все статусы</option>
         <option value="новая" <?= $status_filter === 'новая' ? 'selected' : '' ?>>новая</option>
+        <option value="принята" <?= $status_filter === 'принята' ? 'selected' : '' ?>>принята</option>
         <option value="в работе" <?= $status_filter === 'в работе' ? 'selected' : '' ?>>в работе</option>
+        <option value="на проверке" <?= $status_filter === 'на проверке' ? 'selected' : '' ?>>на проверке</option>
         <option value="выполнена" <?= $status_filter === 'выполнена' ? 'selected' : '' ?>>выполнена</option>
     </select>
 
@@ -163,4 +165,4 @@ include 'includes/header.php';
     </div>
 <?php endif; ?>
 
-<?php include 'includes/footer.php'; ?>     
+<?php include 'includes/footer.php'; ?>

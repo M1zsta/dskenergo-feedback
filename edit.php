@@ -19,7 +19,7 @@ $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $status = trim($_POST['status'] ?? '');
-    $valid_statuses = ['новая', 'в работе', 'выполнена'];
+    $valid_statuses = ['новая', 'принята', 'в работе', 'на проверке', 'выполнена'];
 
     if (!in_array($status, $valid_statuses)) {
         $error = 'Неверный статус';
@@ -65,7 +65,9 @@ include 'includes/header.php';
     <label>Статус:</label>
     <select name="status">
         <option value="новая" <?= $request['status'] === 'новая' ? 'selected' : '' ?>>новая</option>
+        <option value="принята" <?= $request['status'] === 'принята' ? 'selected' : '' ?>>принята</option>
         <option value="в работе" <?= $request['status'] === 'в работе' ? 'selected' : '' ?>>в работе</option>
+        <option value="на проверке" <?= $request['status'] === 'на проверке' ? 'selected' : '' ?>>на проверке</option>
         <option value="выполнена" <?= $request['status'] === 'выполнена' ? 'selected' : '' ?>>выполнена</option>
     </select>
     <button type="submit">Сохранить</button>

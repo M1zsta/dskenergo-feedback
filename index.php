@@ -50,4 +50,6 @@ include 'includes/header.php';
     <button type="submit">Отправить</button>
 </form>
 
+<p><a href="check_status.php">Проверить статус заявки</a></p>
+
 <?php include 'includes/footer.php'; ?>
