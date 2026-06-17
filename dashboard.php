@@ -8,7 +8,37 @@ if (!isset($_SESSION['user_id'])) {
 
 require_once 'config/database.php';
 
-$result = $conn->query("SELECT * FROM requests ORDER BY created_at DESC");
+$search = trim($_GET['search'] ?? '');
+$status_filter = $_GET['status'] ?? '';
+
+$sql = "SELECT * FROM requests WHERE 1=1";
+$params = [];
+$types = "";
+
+if (!empty($search)) {
+    $sql .= " AND (client_name LIKE ? OR topic LIKE ?)";
+    $search_like = "%$search%";
+    $params[] = $search_like;
+    $params[] = $search_like;
+    $types .= "ss";
+}
+
+if (!empty($status_filter)) {
+    $sql .= " AND status = ?";
+    $params[] = $status_filter;
+    $types .= "s";
+}
+
+$sql .= " ORDER BY created_at DESC";
+
+$stmt = $conn->prepare($sql);
+
+if (!empty($params)) {
+    $stmt->bind_param($types, ...$params);
+}
+
+$stmt->execute();
+$result = $stmt->get_result();
 
 include 'includes/header.php';
 ?>
@@ -19,6 +49,20 @@ include 'includes/header.php';
 </div>
 
 <h1>Список обращений</h1>
+
+<form method="GET" action="" style="margin-bottom: 20px;">
+    <input type="text" name="search" placeholder="Поиск по ФИО или теме" value="<?= htmlspecialchars($search) ?>">
+
+    <select name="status">
+        <option value="">Все статусы</option>
+        <option value="новая" <?= $status_filter === 'новая' ? 'selected' : '' ?>>новая</option>
+        <option value="в работе" <?= $status_filter === 'в работе' ? 'selected' : '' ?>>в работе</option>
+        <option value="выполнена" <?= $status_filter === 'выполнена' ? 'selected' : '' ?>>выполнена</option>
+    </select>
+
+    <button type="submit">Найти</button>
+    <a href="dashboard.php">Сбросить</a>
+</form>
 
 <table class="table">
     <thead>
