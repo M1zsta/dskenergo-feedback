@@ -20,47 +20,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
     }
 }
+
+include 'includes/header.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="ru">
+<h1>Форма обращения</h1>
 
-<head>
-    <meta charset="UTF-8">
-    <title>Оставить заявку - ДСК Энерго</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
+<?php if ($success): ?>
+    <p class="success"><?= htmlspecialchars($success) ?></p>
+<?php endif; ?>
 
-<body>
-    <?php include 'includes/header.php'; ?>
+<?php if ($error): ?>
+    <p class="error"><?= htmlspecialchars($error) ?></p>
+<?php endif; ?>
 
-    <h1>Форма обращения</h1>
+<form method="POST" action="">
+    <label>ФИО:</label>
+    <input type="text" name="client_name" required>
 
-    <?php if ($success): ?>
-        <p class="success"><?= htmlspecialchars($success) ?></p>
-    <?php endif; ?>
+    <label>Телефон:</label>
+    <input type="tel" name="phone" required>
 
-    <?php if ($error): ?>
-        <p class="error"><?= htmlspecialchars($error) ?></p>
-    <?php endif; ?>
+    <label>Тема:</label>
+    <input type="text" name="topic" required>
 
-    <form method="POST" action="">
-        <label>ФИО:</label>
-        <input type="text" name="client_name" required>
+    <label>Сообщение:</label>
+    <textarea name="request_text" required></textarea>
 
-        <label>Телефон:</label>
-        <input type="tel" name="phone" required>
+    <button type="submit">Отправить</button>
+</form>
 
-        <label>Тема:</label>
-        <input type="text" name="topic" required>
-
-        <label>Сообщение:</label>
-        <textarea name="request_text" required></textarea>
-
-        <button type="submit">Отправить</button>
-    </form>
-
-    <?php include 'includes/footer.php'; ?>
-</body>
-
-</html>
+<?php include 'includes/footer.php'; ?>

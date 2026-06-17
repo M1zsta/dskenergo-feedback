@@ -29,37 +29,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
     }
 }
+
+include 'includes/header.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="ru">
+<h1>Вход в систему</h1>
 
-<head>
-    <meta charset="UTF-8">
-    <title>Вход - ДСК Энерго</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
+<?php if ($error): ?>
+    <p class="error"><?= htmlspecialchars($error) ?></p>
+<?php endif; ?>
 
-<body>
-    <?php include 'includes/header.php'; ?>
+<form method="POST" action="">
+    <label>Логин:</label>
+    <input type="text" name="login" required>
 
-    <h1>Вход в систему</h1>
+    <label>Пароль:</label>
+    <input type="password" name="password" required>
 
-    <?php if ($error): ?>
-        <p class="error"><?= htmlspecialchars($error) ?></p>
-    <?php endif; ?>
+    <button type="submit">Войти</button>
+</form>
 
-    <form method="POST" action="">
-        <label>Логин:</label>
-        <input type="text" name="login" required>
-
-        <label>Пароль:</label>
-        <input type="password" name="password" required>
-
-        <button type="submit">Войти</button>
-    </form>
-
-    <?php include 'includes/footer.php'; ?>
-</body>
-
-</html>
+<?php include 'includes/footer.php'; ?>
