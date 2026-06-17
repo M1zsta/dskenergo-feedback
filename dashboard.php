@@ -10,7 +10,39 @@ require_once 'config/database.php';
 
 $search = trim($_GET['search'] ?? '');
 $status_filter = $_GET['status'] ?? '';
+$per_page = 5;
+$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$offset = ($page - 1) * $per_page;
 
+// Подсчёт общего количества
+$count_sql = "SELECT COUNT(*) as total FROM requests WHERE 1=1";
+$count_params = [];
+$count_types = "";
+
+if (!empty($search)) {
+    $count_sql .= " AND (client_name LIKE ? OR topic LIKE ?)";
+    $search_like = "%$search%";
+    $count_params[] = $search_like;
+    $count_params[] = $search_like;
+    $count_types .= "ss";
+}
+
+if (!empty($status_filter)) {
+    $count_sql .= " AND status = ?";
+    $count_params[] = $status_filter;
+    $count_types .= "s";
+}
+
+$count_stmt = $conn->prepare($count_sql);
+if (!empty($count_params)) {
+    $count_stmt->bind_param($count_types, ...$count_params);
+}
+$count_stmt->execute();
+$total_result = $count_stmt->get_result();
+$total_rows = $total_result->fetch_assoc()['total'];
+$total_pages = ceil($total_rows / $per_page);
+
+// Основной запрос с LIMIT
 $sql = "SELECT * FROM requests WHERE 1=1";
 $params = [];
 $types = "";
@@ -29,14 +61,13 @@ if (!empty($status_filter)) {
     $types .= "s";
 }
 
-$sql .= " ORDER BY created_at DESC";
+$sql .= " ORDER BY created_at DESC LIMIT ? OFFSET ?";
+$params[] = $per_page;
+$params[] = $offset;
+$types .= "ii";
 
 $stmt = $conn->prepare($sql);
-
-if (!empty($params)) {
-    $stmt->bind_param($types, ...$params);
-}
-
+$stmt->bind_param($types, ...$params);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -95,5 +126,19 @@ include 'includes/header.php';
         <?php endwhile; ?>
     </tbody>
 </table>
+
+<?php if ($total_pages > 1): ?>
+    <div style="margin-top: 20px;">
+        <?php if ($page > 1): ?>
+            <a href="?page=<?= $page - 1 ?>&search=<?= urlencode($search) ?>&status=<?= urlencode($status_filter) ?>">← Назад</a>
+        <?php endif; ?>
+
+        <span>Страница <?= $page ?> из <?= $total_pages ?></span>
+
+        <?php if ($page < $total_pages): ?>
+            <a href="?page=<?= $page + 1 ?>&search=<?= urlencode($search) ?>&status=<?= urlencode($status_filter) ?>">Вперёд →</a>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>
 
 <?php include 'includes/footer.php'; ?>
