@@ -19,15 +19,16 @@ $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $status = trim($_POST['status'] ?? '');
+    $response = trim($_POST['response'] ?? '');
     $valid_statuses = ['новая', 'принята', 'в работе', 'на проверке', 'выполнена'];
 
     if (!in_array($status, $valid_statuses)) {
         $error = 'Неверный статус';
     } else {
-        $stmt = $conn->prepare("UPDATE requests SET status = ? WHERE id = ?");
-        $stmt->bind_param("si", $status, $id);
+        $stmt = $conn->prepare("UPDATE requests SET status = ?, response = ? WHERE id = ?");
+        $stmt->bind_param("ssi", $status, $response, $id);
         $stmt->execute();
-        $success = 'Статус обновлён';
+        $success = 'Статус и ответ сохранены';
         $stmt->close();
     }
 }
@@ -70,6 +71,10 @@ include 'includes/header.php';
         <option value="на проверке" <?= $request['status'] === 'на проверке' ? 'selected' : '' ?>>на проверке</option>
         <option value="выполнена" <?= $request['status'] === 'выполнена' ? 'selected' : '' ?>>выполнена</option>
     </select>
+
+    <label>Ответ клиенту:</label>
+    <textarea name="response" rows="4" placeholder="Введите ответ на заявку..."><?= htmlspecialchars($request['response'] ?? '') ?></textarea>
+
     <button type="submit">Сохранить</button>
 </form>
 

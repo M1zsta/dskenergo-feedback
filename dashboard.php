@@ -16,14 +16,12 @@ $per_page = 5;
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $offset = ($page - 1) * $per_page;
 
-// Валидация сортировки
 $allowed_sort = ['id', 'client_name', 'status', 'created_at'];
 $allowed_order = ['ASC', 'DESC'];
 if (!in_array($sort, $allowed_sort)) $sort = 'created_at';
 if (!in_array(strtoupper($order), $allowed_order)) $order = 'DESC';
 $order = strtoupper($order);
 
-// Подсчёт общего количества
 $count_sql = "SELECT COUNT(*) as total FROM requests WHERE 1=1";
 $count_params = [];
 $count_types = "";
@@ -51,7 +49,6 @@ $total_result = $count_stmt->get_result();
 $total_rows = $total_result->fetch_assoc()['total'];
 $total_pages = ceil($total_rows / $per_page);
 
-// Основной запрос с сортировкой
 $sql = "SELECT * FROM requests WHERE 1=1";
 $params = [];
 $types = "";
@@ -80,7 +77,6 @@ $stmt->bind_param($types, ...$params);
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Функция для ссылки сортировки
 function sort_link($column, $label, $current_sort, $current_order, $search, $status_filter)
 {
     $new_order = ($current_sort === $column && $current_order === 'DESC') ? 'ASC' : 'DESC';
@@ -101,7 +97,7 @@ include 'includes/header.php';
 
 <h1>Список обращений</h1>
 
-<form method="GET" action="" style="margin-bottom: 20px;">
+<form method="GET" action="" class="search-form" style="margin-bottom: 20px;">
     <input type="hidden" name="sort" value="<?= htmlspecialchars($sort) ?>">
     <input type="hidden" name="order" value="<?= htmlspecialchars($order) ?>">
     <input type="text" name="search" placeholder="Поиск по ФИО или теме" value="<?= htmlspecialchars($search) ?>">
@@ -130,6 +126,7 @@ include 'includes/header.php';
             <th><?= sort_link('status', 'Статус', $sort, $order, $search, $status_filter) ?></th>
             <th><?= sort_link('created_at', 'Дата', $sort, $order, $search, $status_filter) ?></th>
             <th>Действия</th>
+            <th>Ответ</th>
         </tr>
     </thead>
     <tbody>
@@ -146,6 +143,7 @@ include 'includes/header.php';
                     <a href="edit.php?id=<?= $row['id'] ?>" class="btn-edit">Изменить статус</a>
                     <a href="delete.php?id=<?= $row['id'] ?>" class="btn-delete" onclick="return confirm('Удалить заявку?')">Удалить</a>
                 </td>
+                <td><?= htmlspecialchars(substr($row['response'] ?? '', 0, 30)) ?><?= empty($row['response']) ? '' : '...' ?></td>
             </tr>
         <?php endwhile; ?>
     </tbody>

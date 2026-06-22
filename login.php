@@ -2,6 +2,12 @@
 session_start();
 require_once 'config/database.php';
 
+function log_security($event, $details = '')
+{
+    $log = date('Y-m-d H:i:s') . " | $event | $details | IP: " . $_SERVER['REMOTE_ADDR'] . "\n";
+    file_put_contents('security.log', $log, FILE_APPEND | LOCK_EX);
+}
+
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -21,10 +27,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['login'] = $user['login'];
             $_SESSION['role'] = $user['role'];
+            log_security('LOGIN_SUCCESS', "user: $login");
             header('Location: dashboard.php');
             exit;
         } else {
             $error = 'Неверный логин или пароль';
+            log_security('LOGIN_FAILED', "user: $login");
         }
         $stmt->close();
     }

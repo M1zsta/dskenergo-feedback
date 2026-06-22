@@ -12,6 +12,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($client_name) || empty($phone) || empty($topic) || empty($request_text)) {
         $error = 'Заполните все обязательные поля';
+    } elseif (strlen($client_name) < 2 || strlen($client_name) > 100) {
+        $error = 'ФИО должно быть от 2 до 100 символов';
+    } elseif (!preg_match('/^[\d\s\-\+\(\)]{5,20}$/', $phone)) {
+        $error = 'Введите корректный номер телефона';
+    } elseif (strlen($topic) < 3 || strlen($topic) > 100) {
+        $error = 'Тема должна быть от 3 до 100 символов';
+    } elseif (strlen($request_text) < 10 || strlen($request_text) > 2000) {
+        $error = 'Сообщение должно быть от 10 до 2000 символов';
     } else {
         $stmt = $conn->prepare("INSERT INTO requests (client_name, phone, topic, request_text) VALUES (?, ?, ?, ?)");
         $stmt->bind_param("ssss", $client_name, $phone, $topic, $request_text);
